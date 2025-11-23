@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.cim/RohithBN/auth"
+	"github.cim/RohithBN/lib"
 	"github.cim/RohithBN/types"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(c *gin.Context) {
@@ -24,6 +26,18 @@ func Register(c *gin.Context) {
 
 	// TODO: store user in database
 
+	hashedPassword , err:= bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
+	if err!= nil{
+		c.JSON(500, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
+	query := "INSERT INTO users (username, password) VALUES (?, ?)"
+	_, err = lib.DB.Exec(query, newUser.Username, string(hashedPassword))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to register user"})
+		return
+	}
 	c.JSON(201, gin.H{"message": "User registered successfully"})
 }
 
@@ -40,11 +54,28 @@ func Login(c *gin.Context) {
 	}
 
 	// TODO: verify user in database
+	query:= "SELECT user_id, password FROM users WHERE username = ?"
+	row:= lib.DB.QueryRow(query, loginUser.Username)
+
+	var storedHashedPassword string
+	var userID int
+	
+	err:= row.Scan(&userID, &storedHashedPassword)
+
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid username or password"})
+		return
+	}
+	
+	err = bcrypt.CompareHashAndPassword([]byte(storedHashedPassword), []byte(loginUser.Password))
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid username or password"})
+		return
+	}
 
 	verifiedUser := &types.User{
-		UserID:   1,
+		UserID:   uint(userID),
 		Username: loginUser.Username,
-		Password: loginUser.Password,
 	}
 
 	fmt.Println("User", verifiedUser)
