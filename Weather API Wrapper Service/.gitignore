@@ -1,0 +1,36 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary, generated with go test -c
+*.test
+
+# Output of go build
+*.o
+
+# Dependencies
+# Vendor directory (if you use Go modules, this might be committed, but often ignored for older projects or specific workflows)
+vendor/
+
+# Go module cache (usually in GOPATH/pkg/mod)
+# This is typically outside the project directory, but can be configured
+# to be within the project, in which case it should be ignored.
+# You might want to ignore the whole go.mod/go.sum if you're not using modules,
+# or specific files if they are generated.
+# For typical Go module usage, go.mod and go.sum should be committed.
+
+# IDE and editor specific files
+.idea/
+.vscode/
+*.swp
+*.bak
+*~
+.DS_Store # macOS specific
+Thumbs.db # Windows specific
+
+# Environment variables and configuration files
+.env
+.env.*
+config.local.yaml

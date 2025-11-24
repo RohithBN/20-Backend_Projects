@@ -184,3 +184,27 @@ func DeleteTodo (c *gin.Context){
 	c.JSON(200, gin.H{"message": "Todo deleted successfully"})
 
 }
+
+func GetTodosByStatus (c *gin.Context){
+	status := c.Param("status")
+	var todos []types.ToDoItem
+	
+	query := "SELECT todo_id, task, status, created_at, created_by FROM todos WHERE status = ?"
+	rows, err := lib.DB.Query(query, status)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to fetch todos by status"})
+		return
+	}
+	defer rows.Close()
+	
+	for rows.Next() {
+		var todo types.ToDoItem
+		err := rows.Scan(&todo.TodoId, &todo.Task, &todo.Status, &todo.CreatedAt, &todo.CreatedBy)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to parse todo item"})
+			return
+		}
+		todos = append(todos, todo)
+	}
+	c.JSON(200, gin.H{"todos": todos})
+}

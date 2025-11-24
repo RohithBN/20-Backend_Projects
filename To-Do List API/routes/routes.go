@@ -26,6 +26,7 @@ func SetupRoutes() *gin.Engine{
 		protectedRoutes.PATCH("/todos/:id",handler.UpdateStatus)
 	    protectedRoutes.DELETE("/todos/:id",handler.DeleteTodo)
 		protectedRoutes.POST("/todos",handler.CreateTodo)
+		protectedRoutes.GET("/todos/:status",handler.GetTodosByStatus)
 	}
 
 	return r;
